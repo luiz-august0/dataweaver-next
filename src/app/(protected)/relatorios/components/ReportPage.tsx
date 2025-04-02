@@ -7,7 +7,7 @@ export const ReportPage = () => {
 
   return (
     <>
-      <HeaderPage titlePage={report ? report.title : 'Relatório'} />
+      <HeaderPage titlePage={report ? report.title : 'Relatório'} back/>
       <div className="flex mt-10 px-3 gap-4">
         <Report />
       </div>

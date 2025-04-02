@@ -11,12 +11,12 @@ export interface Dashboard {
 export interface DashboardReport {
   id?: number;
   report: Report;
-  order: number;
+  sort: number;
 }
 
 export interface DashboardLink {
   id?: number;
   title: string;
   link: string;
-  order: number;
+  sort: number;
 }

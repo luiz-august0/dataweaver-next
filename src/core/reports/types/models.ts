@@ -3,10 +3,12 @@ export interface Report {
   name: string;
   title: string;
   key: string;
+  sql: string;
+  sqlTotalizers?: string;
   active: boolean;
-  columns: ReportColumn[];
+  columns?: ReportColumn[];
   filters?: ReportFilter[];
-  hasTotalizers: boolean;
+  hasTotalizers?: boolean;
 }
 
 export interface ReportColumn {
@@ -14,9 +16,24 @@ export interface ReportColumn {
   field: string;
   html: string;
   headerName: string;
-  headerAlign: string;
-  align: string;
-  order: number;
+  headerAlign: keyof typeof ReportColumnAlignEnum;
+  align: keyof typeof ReportColumnAlignEnum;
+  sort: number;
+  format: keyof typeof ReportColumnFormatEnum;
+}
+
+export enum ReportColumnFormatEnum {
+  'DEFAULT',
+  'MONETARY',
+  'PERCENTUAL',
+  'DDMMYYYY',
+  'DDMMYYYYHHMM',
+}
+
+export enum ReportColumnAlignEnum {
+  'LEFT',
+  'CENTER',
+  'RIGHT',
 }
 
 export enum ReportFilterEnum {
@@ -30,7 +47,8 @@ export interface ReportFilter {
   id?: number;
   label: string;
   parameter: string;
+  sql: string;
   type: keyof typeof ReportFilterEnum;
-  standardValue: string;
-  order: number;
+  standardValue?: string;
+  sort: number;
 }

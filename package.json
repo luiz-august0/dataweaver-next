@@ -28,7 +28,8 @@
     "react-pro-sidebar": "^1.1.0",
     "sonner": "^1.4.41",
     "yup": "^1.4.0",
-    "yup-locale-pt": "^0.0.9"
+    "yup-locale-pt": "^0.0.9",
+    "@monaco-editor/react": "^4.6.0"
   },
   "devDependencies": {
     "@types/node": "^20",
