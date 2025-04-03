@@ -30,27 +30,28 @@ export const Report = () => {
     return <Typography>Relatório não encontrado</Typography>;
   }
 
-  const columns: GridColDef<{ [key: string]: any }>[] = report.columns.map((column) => {
-    return {
-      field: column.field,
-      headerName: column.headerName,
-      align: column.align as GridAlignment,
-      headerAlign: column.headerAlign as GridAlignment,
-      flex: 1,
-      type: 'string',
-      renderCell: (params) => {
-        const regex = /item\.[a-zA-Z0-9_]+/g;
-        let html = column.html;
-        let matches;
+  const columns: GridColDef<{ [key: string]: any }>[] =
+    report?.columns?.map((column) => {
+      return {
+        field: column.field,
+        headerName: column.headerName,
+        align: column.align as GridAlignment,
+        headerAlign: column.headerAlign as GridAlignment,
+        flex: 1,
+        type: 'string',
+        renderCell: (params) => {
+          const regex = /item\.[a-zA-Z0-9_]+/g;
+          let html = column.html;
+          let matches;
 
-        while ((matches = regex.exec(html)) !== null) {
-          html = html.replace(matches[0], params.row?.[matches[0].split('.')[1]]);
-        }
+          while ((matches = regex.exec(html)) !== null) {
+            html = html.replace(matches[0], params.row?.[matches[0].split('.')[1]]);
+          }
 
-        return <div dangerouslySetInnerHTML={{ __html: html }}></div>;
-      },
-    };
-  });
+          return <div dangerouslySetInnerHTML={{ __html: html }}></div>;
+        },
+      };
+    }) ?? [];
 
   return (
     <div className="flex flex-col w-full gap-4">

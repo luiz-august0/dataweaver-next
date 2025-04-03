@@ -1,18 +1,17 @@
 import HeaderPage from '@/components/HeaderPage/HeaderPage';
+import { MonacoEditor } from '@/components/MonacoEditor/MonacoEditor';
+import { getReportById, mutateReport } from '@/core/reports/services/reports';
 import { Report } from '@/core/reports/types/models';
+import { successToast } from '@/helpers/toast';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Button, CircularProgress, debounce, FormControlLabel, Switch, TextField } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import schemaValidation from './schemaValidation';
-import { getReportById, mutateReport } from '@/core/reports/services/reports';
-import { Button, CircularProgress, debounce, FormControlLabel, Switch, TextField } from '@mui/material';
-import { MonacoEditor } from '@/components/MonacoEditor/MonacoEditor';
-import { FiltersTable } from './components/FiltersTable';
-import { SQLEditorForm } from './components/SQLEditorForm';
-import { EditorForm } from './components/EditorForm';
 import { ColumnsTable } from './components/ColumnsTable';
-import { successToast } from '@/helpers/toast';
-import { useRouter } from 'next/navigation';
+import { EditorForm } from './components/EditorForm';
+import { FiltersTable } from './components/FiltersTable';
+import schemaValidation from './schemaValidation';
 
 type Props = {
   id?: number;

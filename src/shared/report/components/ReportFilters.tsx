@@ -31,7 +31,7 @@ export const ReportFilters = ({ setFilters }: Props) => {
       report.filters.forEach((filter) => {
         setFiltersInput((prev) => ({
           ...prev,
-          [filter.parameter]: parseStandardFilterToInput(filter.type, filter.standardValue),
+          [filter.parameter]: parseStandardFilterToInput(filter.type, filter?.standardValue ?? ''),
         }));
       });
     }

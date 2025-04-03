@@ -74,7 +74,7 @@ export default function ConnectionDetails() {
                 </>
               ) : (
                 <Typography fontSize={14}>
-                  Não há cadastro de conexão com base de dados, cadastre uma clicando em "Nova Conexão"
+                  {"Não há cadastro de conexão com base de dados, cadastre uma clicando em 'Nova Conexão'"}
                 </Typography>
               )}
             </div>
