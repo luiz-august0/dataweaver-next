@@ -1,14 +1,20 @@
 import DataGrid from '@/components/DataGrid/DataGrid';
-import { CircularProgress, Typography } from '@mui/material';
+import { Button, CircularProgress, Typography } from '@mui/material';
 import { GridAlignment, GridColDef } from '@mui/x-data-grid';
 import { ReportFilters } from './components/ReportFilters';
 import { ReportTotalizers } from './components/ReportTotalizers';
 import { useReport } from './hooks/useReport';
 import useReportResultQuery from './hooks/useReportResultQuery';
 import useReportTotalizersQuery from './hooks/useReportTotalizersQuery';
+import { useState } from 'react';
+import { getReportPdf } from '@/core/reports/services/reports';
+import { convertSortModelToString } from '@/helpers/converters';
+import * as Icon from '@mui/icons-material';
 
 export const Report = () => {
   const { loading, report } = useReport();
+  const [loadingPdf, setLoadingPdf] = useState<boolean>(false);
+
   const {
     list,
     loading: loadingResult,
@@ -19,7 +25,6 @@ export const Report = () => {
     filters,
     setFilters,
   } = useReportResultQuery(report?.id);
-
   const { list: totalizers, loading: loadingTotalizers } = useReportTotalizersQuery(report, filters);
 
   if (loading) {
@@ -53,10 +58,44 @@ export const Report = () => {
       };
     }) ?? [];
 
+  const handleExportPdf = async () => {
+    setLoadingPdf(true);
+
+    if (!list || list?.content?.length <= 0) {
+      setLoadingPdf(false);
+      return;
+    }
+
+    const data = await getReportPdf({
+      id: report?.id ?? 0,
+      sort: sort && convertSortModelToString(sort),
+      filters,
+    });
+
+    if (data) {
+      const URL = window.URL || window.webkitURL;
+      const fileURL = URL.createObjectURL(data);
+      window.open(fileURL, '_blank');
+    }
+
+    setLoadingPdf(false);
+  };
+
   return (
     <div className="flex flex-col w-full gap-4">
       <ReportFilters setFilters={setFilters} />
       {report.hasTotalizers && <ReportTotalizers totalizers={totalizers} loading={loadingTotalizers} />}
+      <Button
+        startIcon={<Icon.Download />}
+        sx={{
+          alignSelf: 'end',
+        }}
+        variant="contained"
+        onClick={handleExportPdf}
+        disabled={loadingPdf}
+      >
+        Exportar PDF
+      </Button>
       <DataGrid
         loading={loadingResult}
         rows={list?.content ?? []}

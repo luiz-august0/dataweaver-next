@@ -2,7 +2,7 @@ import { handlerHttpError } from '@/helpers/toast';
 import { httpInstance } from '@/lib/axios/httpInstance';
 import { AsyncResponse } from '@/shared/types/models';
 import { DefaultRequestParams } from '@/shared/types/props';
-import { ReportListResponseDTO } from '../types/dtos';
+import { ReportListResponseDTO, ReportResultDTO } from '../types/dtos';
 import { Report } from '../types/models';
 
 export async function getReportByKey({ key }: { key: string }) {
@@ -30,9 +30,9 @@ export async function getReportResult({
   paginationDTO,
   sort,
   filters,
-}: { id: number; filters?: { [key: string]: any } } & DefaultRequestParams) {
+}: { id: number; filters?: { [key: string]: any } } & DefaultRequestParams): Promise<AsyncResponse<ReportResultDTO>> {
   try {
-    const { data } = await httpInstance.get(`/report/${id}/result`, {
+    const { data } = await httpInstance.get(`/report/result/${id}`, {
       params: { ...paginationDTO, ...filters, sort },
     });
 
@@ -42,9 +42,32 @@ export async function getReportResult({
   }
 }
 
-export async function getReportTotalizers({ id, filters }: { id: number; filters?: { [key: string]: any } }) {
+export async function getReportPdf({
+  id,
+  sort,
+  filters,
+}: { id: number; filters?: { [key: string]: any } } & DefaultRequestParams): Promise<AsyncResponse<Blob>> {
   try {
-    const { data } = await httpInstance.get(`/report/${id}/totalizers`, {
+    const { data } = await httpInstance.get(`/report/result/${id}/pdf`, {
+      params: { ...filters, sort },
+      responseType: 'blob',
+    });
+
+    return data;
+  } catch (error) {
+    handlerHttpError(error);
+  }
+}
+
+export async function getReportTotalizers({
+  id,
+  filters,
+}: {
+  id: number;
+  filters?: { [key: string]: any };
+}): Promise<AsyncResponse<{ [key: string]: any }>> {
+  try {
+    const { data } = await httpInstance.get(`/report/result/${id}/totalizers`, {
       params: { ...filters },
     });
 
