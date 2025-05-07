@@ -1,4 +1,3 @@
-import PasswordInput from '@/components/PasswordInput/PasswordInput';
 import { changePassword } from '@/core/recovery/services/recovery';
 import { successToast } from '@/helpers/toast';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -6,6 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { StepProps } from '../types';
 import schemaValidation from './schemaValidation';
+import PasswordInput from '@/components/customized/PasswordInput/PasswordInput';
 
 type FormProps = {
   password: string;
@@ -21,8 +21,7 @@ export const useRecoveryStep = (recoveryToken: string, onSuccess: () => void): S
     formState: { errors },
     clearErrors,
     reset,
-    watch,
-    setValue,
+    register,
   } = form;
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -52,30 +51,22 @@ export const useRecoveryStep = (recoveryToken: string, onSuccess: () => void): S
     fields: (
       <>
         <PasswordInput
-          value={watch('password')}
-          onChange={(e) => setValue('password', e.target.value)}
-          margin="normal"
+          {...register('password')}
           required
           id="password"
-          fullWidth
           name="password"
           autoFocus
           label="Senha"
-          error={!!errors.password}
-          helperText={errors.password?.message}
+          errorMessage={errors.password?.message}
         />
         <PasswordInput
-          value={watch('confirmPassword')}
-          onChange={(e) => setValue('confirmPassword', e.target.value)}
-          margin="normal"
+          {...register('confirmPassword')}
           required
           id="confirmPassword"
-          fullWidth
           name="confirmPassword"
           autoFocus
           label="Confirmar senha"
-          error={!!errors.confirmPassword}
-          helperText={errors.confirmPassword?.message}
+          errorMessage={errors.confirmPassword?.message}
         />
       </>
     ),

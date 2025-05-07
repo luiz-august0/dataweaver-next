@@ -1,15 +1,7 @@
-import { GridSortItem, GridSortModel } from '@mui/x-data-grid';
+import { SortingState } from '@tanstack/react-table';
 
-export const convertSortModelToString = (sortModel?: GridSortModel): string => {
-  if (sortModel && sortModel?.length > 0) {
-    let sortedField: GridSortItem = sortModel[0];
-
-    if (!sortedField.field || sortedField.field == '') return '';
-
-    return sortedField.field + ',' + sortedField.sort;
-  }
-
-  return '';
+export const convertSortingToSortRequest = (sorting: SortingState) => {
+  return (sorting?.length ?? 0) > 0 ? `${sorting[0].id}${sorting[0].desc ? ',desc' : ',asc'}` : undefined;
 };
 
 export const convertUrlToBlob = async (url: string) => {

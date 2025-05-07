@@ -1,78 +1,62 @@
-import Chip from '@/components/Chip/Chip';
-import DataGrid from '@/components/DataGrid/DataGrid';
+import Chip from '@/components/customized/Chip/Chip';
+import { DataTable, SortableHeader } from '@/components/customized/DataTable/DataTable';
 import { UserPageResponseDTO } from '@/core/users/types/dtos';
 import { EnumUserRole } from '@/core/users/types/enums';
 import { User } from '@/core/users/types/models';
+import { PaginationRequestDTO } from '@/shared/types/dtos';
 import { EnumDefaultStatus } from '@/shared/types/enums';
-import { GridColDef, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
-import { Dispatch } from 'react';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
+import { Dispatch, SetStateAction } from 'react';
 
 type Props = {
   list?: UserPageResponseDTO;
-  pagination: GridPaginationModel;
-  setPagination: Dispatch<React.SetStateAction<GridPaginationModel>>;
+  setPagination: Dispatch<SetStateAction<PaginationRequestDTO>>;
   loading: boolean;
-  sort?: GridSortModel;
-  setSort?: Dispatch<React.SetStateAction<GridSortModel | undefined>>;
   setUser: Dispatch<React.SetStateAction<User | undefined>>;
   setOpen: Dispatch<React.SetStateAction<boolean>>;
+  sorting: SortingState;
+  setSorting: Dispatch<SetStateAction<SortingState>>;
 };
 
-export default function UsersTable({
-  list,
-  pagination,
-  setPagination,
-  loading,
-  sort,
-  setSort,
-  setUser,
-  setOpen,
-}: Props) {
-  const columns: GridColDef<User>[] = [
+export default function UsersTable({ list, setPagination, loading, setUser, setOpen, sorting, setSorting }: Props) {
+  const columns: ColumnDef<User>[] = [
     {
-      field: 'id',
-      headerName: 'Cód.',
-      flex: 1,
+      accessorKey: 'id',
+      header: ({ column }) => <SortableHeader column={column} header="Cód" />,
     },
     {
-      field: 'login',
-      headerName: 'Usuário',
-      flex: 1
+      accessorKey: 'login',
+      header: ({ column }) => <SortableHeader column={column} header="Usuário" />,
     },
     {
-      field: 'role',
-      headerName: 'Tipo',
-      renderCell(params) {
-        return <Chip enumParams={EnumUserRole[params.value]} />;
+      accessorKey: 'role',
+      header: 'Tipo',
+      cell: ({ row }) => {
+        return <Chip enumParams={EnumUserRole[row.getValue('role') as keyof typeof EnumUserRole]} />;
       },
-      flex: 1,
     },
     {
-      field: 'active',
-      headerName: 'Ativo',
-      renderCell(params) {
-        return <Chip enumParams={EnumDefaultStatus[params.value]} />;
+      accessorKey: 'active',
+      header: 'Ativo',
+      cell: ({ row }) => {
+        return <Chip enumParams={EnumDefaultStatus[row.getValue('active') as keyof typeof EnumDefaultStatus]} />;
       },
-      flex: 1,
     },
   ];
 
   return (
-    <DataGrid
-      loading={loading}
-      rows={list?.content ?? []}
+    <DataTable
       columns={columns}
-      paginationModel={pagination}
-      onPaginationModelChange={setPagination}
-      rowCount={list?.totalElements ?? 0}
-      pageSizeOptions={(list?.totalElements ?? 0) > 10 ? [10, 25, 50] : [list?.totalElements ?? 0]}
-      sortModel={sort}
-      onSortModelChange={setSort}
-      onRowClick={(params) => {
-        setUser(params.row);
+      data={list?.content || []}
+      pagination={list}
+      setPagination={setPagination}
+      loading={loading}
+      onRowClick={(user) => {
+        setUser(user);
         setOpen(true);
       }}
-      sortingMode="server"
+      sorting={sorting}
+      onSortingChange={setSorting}
     />
   );
 }

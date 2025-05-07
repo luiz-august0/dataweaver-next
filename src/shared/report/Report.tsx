@@ -1,6 +1,3 @@
-import DataGrid from '@/components/DataGrid/DataGrid';
-import { Button, CircularProgress, Typography } from '@mui/material';
-import { GridAlignment, GridColDef } from '@mui/x-data-grid';
 import { ReportFilters } from './components/ReportFilters';
 import { ReportTotalizers } from './components/ReportTotalizers';
 import { useReport } from './hooks/useReport';
@@ -8,8 +5,11 @@ import useReportResultQuery from './hooks/useReportResultQuery';
 import useReportTotalizersQuery from './hooks/useReportTotalizersQuery';
 import { useState } from 'react';
 import { getReportPdf } from '@/core/reports/services/reports';
-import { convertSortModelToString } from '@/helpers/converters';
-import * as Icon from '@mui/icons-material';
+import { Download, Loader2 } from 'lucide-react';
+import { convertSortingToSortRequest } from '@/helpers/converters';
+import { Button } from '@/components/ui/button';
+import { DataTable, SortableHeader } from '@/components/customized/DataTable/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
 
 export const Report = () => {
   const { loading, report } = useReport();
@@ -18,39 +18,36 @@ export const Report = () => {
   const {
     list,
     loading: loadingResult,
-    pagination,
     setPagination,
-    sort,
-    setSort,
+    sorting,
+    setSorting,
     filters,
     setFilters,
   } = useReportResultQuery(report?.id);
   const { list: totalizers, loading: loadingTotalizers } = useReportTotalizersQuery(report, filters);
 
   if (loading) {
-    return <CircularProgress />;
+    return <Loader2 className="h-8 w-8 animate-spin text-primary" />;
   }
 
   if (!report || report == null) {
-    return <Typography>Relatório não encontrado</Typography>;
+    return <h1>Relatório não encontrado</h1>;
   }
 
-  const columns: GridColDef<{ [key: string]: any }>[] =
-    report?.columns?.map((column) => {
+  const columns: ColumnDef<{ [key: string]: any }>[] =
+    report?.columns?.map((reportColumn) => {
       return {
-        field: column.field,
-        headerName: column.headerName,
-        align: column.align as GridAlignment,
-        headerAlign: column.headerAlign as GridAlignment,
-        flex: 1,
-        type: 'string',
-        renderCell: (params) => {
+        accessorKey: reportColumn.field,
+        header: ({ column }) => <SortableHeader column={column} header={reportColumn.headerName} />,
+        // align: column.align,
+        // headerAlign: column.headerAlign as GridAlignment,
+        cel: ({ row }) => {
           const regex = /item\.[a-zA-Z0-9_]+/g;
-          let html = column.html;
+          let html = reportColumn.html;
           let matches;
 
           while ((matches = regex.exec(html)) !== null) {
-            html = html.replace(matches[0], params.row?.[matches[0].split('.')[1]]);
+            html = html.replace(matches[0], row.getValue(matches[0].split('.')[1]));
           }
 
           return <div dangerouslySetInnerHTML={{ __html: html }}></div>;
@@ -68,7 +65,7 @@ export const Report = () => {
 
     const data = await getReportPdf({
       id: report?.id ?? 0,
-      sort: sort && convertSortModelToString(sort),
+      sort: convertSortingToSortRequest(sorting),
       filters,
     });
 
@@ -85,29 +82,18 @@ export const Report = () => {
     <div className="flex flex-col w-full gap-4">
       <ReportFilters setFilters={setFilters} />
       {report.hasTotalizers && <ReportTotalizers totalizers={totalizers} loading={loadingTotalizers} />}
-      <Button
-        startIcon={<Icon.Download />}
-        sx={{
-          alignSelf: 'end',
-        }}
-        variant="contained"
-        onClick={handleExportPdf}
-        disabled={loadingPdf}
-      >
+      <Button className="self-end" onClick={handleExportPdf} disabled={loadingPdf}>
+        <Download className="mr-2 h-4 w-4" />
         Exportar PDF
       </Button>
-      <DataGrid
-        loading={loadingResult}
-        rows={list?.content ?? []}
+      <DataTable
         columns={columns}
-        paginationModel={pagination}
-        onPaginationModelChange={setPagination}
-        rowCount={list?.totalElements ?? 0}
-        pageSizeOptions={(list?.totalElements ?? 0) > 10 ? [10, 25, 50] : [list?.totalElements ?? 0]}
-        sortModel={sort}
-        onSortModelChange={setSort}
-        sortingMode="server"
-        getRowId={() => crypto.randomUUID()}
+        data={list?.content || []}
+        pagination={list}
+        setPagination={setPagination}
+        loading={loadingResult}
+        sorting={sorting}
+        onSortingChange={setSorting}
       />
     </div>
   );

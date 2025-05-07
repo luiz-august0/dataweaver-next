@@ -1,10 +1,15 @@
 import NextSessionProvider from '@/core/auth/providers/NextSessionProvider';
 import type { Metadata } from 'next';
-import { Open_Sans } from 'next/font/google';
+import { Inter as FontInter } from 'next/font/google';
+
 import { Toaster } from 'sonner';
 import './globals.css';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
-const sans = Open_Sans({ subsets: ['latin'] });
+const fontInter = FontInter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Data Weaver',
@@ -17,12 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={sans.className}>
-        <NextSessionProvider>
-          <Toaster richColors position="bottom-left" />
-          {children}
-        </NextSessionProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${fontInter.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <NextSessionProvider>
+            <Toaster richColors position="bottom-left" />
+            {children}
+          </NextSessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

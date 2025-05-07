@@ -1,4 +1,4 @@
-import HeaderPage from '@/components/HeaderPage/HeaderPage';
+import HeaderPage from '@/components/customized/HeaderPage/HeaderPage';
 import { useReport } from '@/shared/report/hooks/useReport';
 import { Report } from '@/shared/report/Report';
 
@@ -8,7 +8,7 @@ export const ReportPage = () => {
   return (
     <>
       <HeaderPage titlePage={report ? report.title : 'Relatório'} back/>
-      <div className="flex mt-10 px-3 gap-4">
+      <div className="flex gap-4">
         <Report />
       </div>
     </>

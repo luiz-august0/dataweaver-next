@@ -1,17 +1,12 @@
-import DataGrid from '@/components/DataGrid/DataGrid';
-import {
-  Report,
-  ReportColumnAlignEnum,
-  ReportColumnFormatEnum,
-  ReportFilter,
-  ReportFilterEnum,
-} from '@/core/reports/types/models';
-import * as Icon from '@mui/icons-material';
-import { Button, debounce, MenuItem, TextField, Typography } from '@mui/material';
-import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataTable } from '@/components/customized/DataTable/DataTable';
+import Input from '@/components/customized/Input/Input';
+import Select from '@/components/customized/Select/Select';
+import { Button } from '@/components/ui/button';
+import { Report, ReportColumn, ReportColumnAlignEnum, ReportColumnFormatEnum } from '@/core/reports/types/models';
+import { ColumnDef } from '@tanstack/react-table';
+import { Plus, Trash } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { inputProps, TableField } from './commonTable';
 
 type Props = {
   setColumnIndex: Dispatch<SetStateAction<number | undefined>>;
@@ -24,6 +19,7 @@ export const ColumnsTable = ({ setColumnIndex }: Props) => {
     watch,
     formState: { errors },
     clearErrors,
+    register,
   } = useFormContext<Report>();
 
   const { fields, append, remove } = useFieldArray({
@@ -31,241 +27,179 @@ export const ColumnsTable = ({ setColumnIndex }: Props) => {
     name: 'columns',
   });
 
-  const getIndex = (params: GridRenderCellParams) => {
-    return fields.findIndex((item) => item.id == params.id);
+  const getIndex = (row: ReportColumn) => {
+    return fields.findIndex((item) => item.id == row.id);
   };
 
-  const columns: GridColDef<ReportFilter>[] = [
+  const columns: ColumnDef<ReportColumn>[] = [
     {
-      field: 'actions',
-      headerName: '',
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'id',
+      header: '',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <Button
-              variant={'text'}
-              sx={{
-                minWidth: 24,
-              }}
-              onClick={() => {
-                clearErrors(`columns.${index}`);
-                remove(index);
-              }}
-            >
-              <Icon.Delete />
-            </Button>
-          </TableField>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              clearErrors(`columns.${index}`);
+              remove(index);
+            }}
+          >
+            <Trash className="h-5 w-5 text-primary" />
+          </Button>
         );
       },
     },
     {
-      field: 'sort',
-      sortable: false,
-      headerName: 'Ordem',
-      minWidth: 160,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'sort',
+      header: 'Ordem',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              placeholder="Ordem"
-              defaultValue={params.value}
-              onKeyDown={(e) => e.stopPropagation()}
-              onChange={debounce((e) => {
-                setValue(`columns.${index}.sort`, e.target.value);
-                clearErrors(`columns.${index}.sort`);
-              }, 500)}
-              type="number"
-              error={errors?.columns && !!errors?.columns[index]?.sort?.message}
-            />
-          </TableField>
+          <Input
+            {...register(`columns.${index}.sort`)}
+            onKeyDown={(e) => e.stopPropagation()}
+            placeholder="Ordem"
+            type="number"
+            error={!!errors.columns?.[index]?.sort?.message}
+          />
         );
       },
     },
     {
-      field: 'field',
-      sortable: false,
-      headerName: 'Campo',
-      minWidth: 184,
-      flex: 1,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'field',
+      header: 'Campo',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              placeholder="Campo"
-              defaultValue={params.value}
-              onKeyDown={(e) => e.stopPropagation()}
-              onChange={debounce((e) => {
-                setValue(`columns.${index}.field`, e.target.value);
-                clearErrors(`columns.${index}.field`);
-              }, 500)}
-              error={errors?.columns && !!errors?.columns[index]?.field?.message}
-            />
-          </TableField>
+          <Input
+            {...register(`columns.${index}.field`)}
+            onKeyDown={(e) => e.stopPropagation()}
+            placeholder="Campo"
+            error={!!errors.columns?.[index]?.field?.message}
+          />
         );
       },
     },
     {
-      field: 'html',
-      sortable: false,
-      headerName: 'HTML',
-      minWidth: 184,
-      flex: 1,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'html',
+      header: 'HTML',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              placeholder="HTML"
-              value={watch(`columns.${index}.html`)}
-              error={errors?.columns && !!errors?.columns[index]?.html?.message}
-              onFocus={(e) => {
-                setColumnIndex(index);
-                e.target.blur();
-              }}
-              focused={false}
-            />
-          </TableField>
+          <Input
+            placeholder="HTML"
+            defaultValue={watch(`columns.${index}.html`)}
+            error={!!errors.columns?.[index]?.html?.message}
+            onFocus={(e) => {
+              setColumnIndex(index);
+              e.target.blur();
+            }}
+          />
         );
       },
     },
     {
-      field: 'headerName',
-      sortable: false,
-      headerName: 'Header',
-      minWidth: 184,
-      flex: 1,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'headerName',
+      header: 'Header',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              placeholder="Header"
-              defaultValue={params.value}
-              onKeyDown={(e) => e.stopPropagation()}
-              onChange={debounce((e) => {
-                setValue(`columns.${index}.headerName`, e.target.value);
-                clearErrors(`columns.${index}.headerName`);
-              }, 500)}
-              error={errors?.columns && !!errors?.columns[index]?.headerName?.message}
-            />
-          </TableField>
+          <Input
+            {...register(`columns.${index}.headerName`)}
+            placeholder="Header"
+            onKeyDown={(e) => e.stopPropagation()}
+            error={!!errors.columns?.[index]?.headerName?.message}
+          />
         );
       },
     },
     {
-      field: 'headerAlign',
-      sortable: false,
-      headerName: 'Alinhamento do Header',
-      minWidth: 184,
-      flex: 1,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'headerAlign',
+      header: 'Alinhamento do Header',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              value={watch(`columns.${index}.headerAlign`)}
-              onChange={(e) => {
-                setValue(`columns.${index}.headerAlign`, e.target.value as keyof typeof ReportColumnAlignEnum);
-                clearErrors(`columns.${index}.headerAlign`);
-              }}
-              placeholder="Alinhamento do Header"
-              onKeyDown={(e) => e.stopPropagation()}
-              select
-              error={errors?.columns && !!errors?.columns[index]?.headerAlign}
-            >
-              {Object.values(ReportColumnAlignEnum)
-                .filter((key) => typeof key == 'string')
-                .map((key) => (
-                  <MenuItem key={key} value={key}>
-                    {key}
-                  </MenuItem>
-                ))}
-            </TextField>
-          </TableField>
+          <Select
+            className="w-full"
+            options={Object.values(ReportColumnAlignEnum)
+              .filter((key) => typeof key == 'string')
+              .map((key) => ({
+                key,
+                label: key,
+                value: key,
+              }))}
+            value={watch(`columns.${index}.headerAlign`)}
+            onValueChange={(value) => {
+              setValue(`columns.${index}.headerAlign`, value as keyof typeof ReportColumnAlignEnum);
+              clearErrors(`columns.${index}.headerAlign`);
+            }}
+            placeholder="Alinhamento do Header"
+            onKeyDown={(e) => e.stopPropagation()}
+            error={!!errors.columns?.[index]?.headerAlign?.message}
+          />
         );
       },
     },
     {
-      field: 'align',
-      sortable: false,
-      headerName: 'Alinhamento da Coluna',
-      minWidth: 184,
-      flex: 1,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'align',
+      header: 'Alinhamento da Coluna',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              value={watch(`columns.${index}.align`)}
-              onChange={(e) => {
-                setValue(`columns.${index}.align`, e.target.value as keyof typeof ReportColumnAlignEnum);
-                clearErrors(`columns.${index}.align`);
-              }}
-              placeholder="Alinhamento da Coluna"
-              onKeyDown={(e) => e.stopPropagation()}
-              select
-              error={errors?.columns && !!errors?.columns[index]?.align}
-            >
-              {Object.values(ReportColumnAlignEnum)
-                .filter((key) => typeof key == 'string')
-                .map((key) => (
-                  <MenuItem key={key} value={key}>
-                    {key}
-                  </MenuItem>
-                ))}
-            </TextField>
-          </TableField>
+          <Select
+            className="w-full"
+            options={Object.values(ReportColumnAlignEnum)
+              .filter((key) => typeof key == 'string')
+              .map((key) => ({
+                key,
+                label: key,
+                value: key,
+              }))}
+            value={watch(`columns.${index}.align`)}
+            onValueChange={(value) => {
+              setValue(`columns.${index}.align`, value as keyof typeof ReportColumnAlignEnum);
+              clearErrors(`columns.${index}.align`);
+            }}
+            placeholder="Alinhamento do Header"
+            onKeyDown={(e) => e.stopPropagation()}
+            error={!!errors.columns?.[index]?.align?.message}
+          />
         );
       },
     },
     {
-      field: 'format',
-      sortable: false,
-      headerName: 'Formato',
-      minWidth: 220,
-      flex: 1,
-      renderCell: (params) => {
-        const index = getIndex(params);
+      accessorKey: 'format',
+      header: 'Formato',
+      cell: ({ row }) => {
+        const index = getIndex(row.original);
 
         return (
-          <TableField>
-            <TextField
-              {...inputProps}
-              value={watch(`columns.${index}.format`)}
-              onChange={(e) => {
-                setValue(`columns.${index}.format`, e.target.value as keyof typeof ReportColumnFormatEnum);
-                clearErrors(`columns.${index}.format`);
-              }}
-              placeholder="Tipo"
-              onKeyDown={(e) => e.stopPropagation()}
-              select
-              error={errors?.columns && !!errors?.columns[index]?.format}
-            >
-              {Object.values(ReportColumnFormatEnum)
-                .filter((key) => typeof key == 'string')
-                .map((key) => (
-                  <MenuItem key={key} value={key}>
-                    {key}
-                  </MenuItem>
-                ))}
-            </TextField>
-          </TableField>
+          <Select
+            className="w-full"
+            options={Object.values(ReportColumnFormatEnum)
+              .filter((key) => typeof key == 'string')
+              .map((key) => ({
+                key,
+                label: key,
+                value: key,
+              }))}
+            value={watch(`columns.${index}.format`)}
+            onValueChange={(value) => {
+              setValue(`columns.${index}.format`, value as keyof typeof ReportColumnFormatEnum);
+              clearErrors(`columns.${index}.format`);
+            }}
+            placeholder="Alinhamento do Header"
+            onKeyDown={(e) => e.stopPropagation()}
+            error={!!errors.columns?.[index]?.format?.message}
+          />
         );
       },
     },
@@ -274,7 +208,7 @@ export const ColumnsTable = ({ setColumnIndex }: Props) => {
   return (
     <div className="flex w-full flex-col gap-2 mt-6">
       <div className="flex fle-row justify-between items-center">
-        <Typography fontSize={20}>Colunas</Typography>
+        <h1 className="text-xl">Colunas</h1>
         <Button
           onClick={() =>
             append({
@@ -288,11 +222,11 @@ export const ColumnsTable = ({ setColumnIndex }: Props) => {
             })
           }
         >
-          <Icon.Add />
+          <Plus className="mr-2 h-4 w-4" />
           Adicionar coluna
         </Button>
       </div>
-      <DataGrid columns={columns} rows={fields || []} getRowId={(r) => r.id} paginationLess />
+      <DataTable columns={columns} data={fields || []} />
     </div>
   );
 };

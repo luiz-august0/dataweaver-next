@@ -1,14 +1,14 @@
-import StandardForm from '@/components/FormTypes/StandardForm';
-import { FormButton } from '@/components/FormTypes/types/models';
+import StandardForm from '@/components/customized/FormTypes/StandardForm';
+import { FormButton } from '@/components/customized/FormTypes/types/models';
+import Input from '@/components/customized/Input/Input';
+import PasswordInput from '@/components/customized/PasswordInput/PasswordInput';
+import { create, edit } from '@/core/connection/services/connection';
 import { Connection } from '@/core/connection/types/models';
 import { successToast } from '@/helpers/toast';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Dispatch, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import schemaValidation from './schemaValidation';
-import { create, edit } from '@/core/connection/services/connection';
-import { TextField } from '@mui/material';
-import PasswordInput from '@/components/PasswordInput/PasswordInput';
 
 type Props = {
   open: boolean;
@@ -67,7 +67,7 @@ export default function ConnectionForm({ open, setOpen, connection, onSubmitForm
       title: 'Cancelar',
       color: 'primary',
       onClick: handleClose,
-      variant: 'outlined',
+      variant: 'outline',
     },
     {
       id: 'submit',
@@ -76,7 +76,7 @@ export default function ConnectionForm({ open, setOpen, connection, onSubmitForm
       color: 'primary',
       onClick: handleSubmit(onSubmit),
       loading: loading,
-      variant: 'contained',
+      variant: 'default',
     },
   ];
 
@@ -86,23 +86,19 @@ export default function ConnectionForm({ open, setOpen, connection, onSubmitForm
         formButtons={buttons}
         formTitle={connection ? 'Editar Conexão' : 'Nova Conexão'}
         handleClose={handleClose}
-        maxWidth={'md'}
         open={open}
       >
-        <div className="flex flex-col mt-4 gap-4 items-start">
-          <TextField
+        <div className="flex flex-col gap-4">
+          <Input
             {...register('host')}
             required
-            fullWidth
             id="connection-host-text"
             label="Host"
             name="host"
-            error={!!errors.host}
-            helperText={errors.host?.message}
+            errorMessage={errors.host?.message}
           />
-          <TextField
+          <Input
             required
-            fullWidth
             id="connection-port-text"
             label="Porta"
             name="port"
@@ -112,41 +108,31 @@ export default function ConnectionForm({ open, setOpen, connection, onSubmitForm
               clearErrors('port');
               setValue('port', Number(parseFloat(e.target.value).toFixed(0)));
             }}
-            error={!!errors.port}
-            helperText={errors.port?.message}
+            errorMessage={errors.port?.message}
           />
-          <TextField
+          <Input
             {...register('database')}
             required
-            fullWidth
             id="connection-database-text"
             label="Base"
             name="database"
-            error={!!errors.database}
-            helperText={errors.database?.message}
+            errorMessage={errors.database?.message}
           />
-          <TextField
+          <Input
             {...register('username')}
             required
-            fullWidth
             id="connection-username-text"
             label="Usuário"
             name="username"
-            error={!!errors.username}
-            helperText={errors.username?.message}
+            errorMessage={errors.username?.message}
           />
           <PasswordInput
-            value={watch('password')}
-            onChange={(e) => setValue('password', e.target.value)}
-            margin="normal"
+            {...register('password')}
             required
             id="password"
-            fullWidth
             name="password"
-            autoFocus
             label="Senha"
-            error={!!errors.password}
-            helperText={errors.password?.message}
+            errorMessage={errors.password?.message}
           />
         </div>
       </StandardForm>

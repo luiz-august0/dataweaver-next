@@ -1,8 +1,11 @@
 import { ReportFilterEnum } from '@/core/reports/types/models';
-import { debounce, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useReport } from '../hooks/useReport';
 import { parseInputToFilter, parseStandardFilterToInput } from '../utils/parsers';
+import debounce from 'lodash.debounce';
+import { cn } from '@/helpers/cn';
+import Input from '@/components/customized/Input/Input';
+import Select from '@/components/customized/Select/Select';
 
 type Props = {
   setFilters: Dispatch<SetStateAction<{ [key: string]: any }>>;
@@ -43,31 +46,27 @@ export const ReportFilters = ({ setFilters }: Props) => {
   };
 
   return (
-    <Stack
-      display={'flex'}
-      flexDirection={{ sm: 'row' }}
-      gap={2}
-      width={{ sm: '50%', xs: report?.filters && report?.filters.length < 2 ? '50%' : '100%' }}
+    <div
+      className={cn(
+        'flex flex-col sm:flex-row gap-4 w-full',
+      )}
     >
       {report?.filters?.map((filter) => {
         switch (filter.type) {
           case 'DATE':
             return (
-              <TextField
-                fullWidth
+              <Input
                 id={`${filter.parameter}-date`}
                 label={filter.label}
                 name={filter.parameter}
                 value={filtersInput[filter.parameter]}
                 onChange={(e) => handleChangeInput(filter.type, filter.parameter, e.target.value)}
                 type="date"
-                InputLabelProps={{ shrink: true }}
               />
             );
           case 'NUMBER':
             return (
-              <TextField
-                fullWidth
+              <Input
                 id={`${filter.parameter}-number`}
                 label={filter.label}
                 name={filter.parameter}
@@ -78,8 +77,7 @@ export const ReportFilters = ({ setFilters }: Props) => {
             );
           case 'TEXT':
             return (
-              <TextField
-                fullWidth
+              <Input
                 id={`${filter.parameter}-text`}
                 label={filter.label}
                 name={filter.parameter}
@@ -91,26 +89,19 @@ export const ReportFilters = ({ setFilters }: Props) => {
             return (
               <Select
                 id={`${filter.parameter}-boolean`}
-                label={filter.label}
+                placeholder="Selecione uma opção"
                 name={filter.parameter}
                 value={filtersInput[filter.parameter]}
-                onChange={(e) =>
-                  handleChangeInput(
-                    filter.type,
-                    filter.parameter,
-                    EnumBooleanFilter[e.target.value as keyof typeof EnumBooleanFilter],
-                  )
-                }
-              >
-                {Object.entries(EnumBooleanFilter).map(([key, value]) => (
-                  <MenuItem key={key} value={key}>
-                    {value.label}
-                  </MenuItem>
-                ))}
-              </Select>
+                onValueChange={(value) => handleChangeInput(filter.type, filter.parameter, value)}
+                options={Object.entries(EnumBooleanFilter).map(([key, { value, label }]) => ({
+                  key,
+                  label,
+                  value,
+                }))}
+              />
             );
         }
       })}
-    </Stack>
+    </div>
   );
 };

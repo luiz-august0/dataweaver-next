@@ -1,22 +1,23 @@
 import { getUsersList } from '@/core/users/services/users';
 import { UserPageResponseDTO } from '@/core/users/types/dtos';
-import { convertSortModelToString } from '@/helpers/converters';
+import { convertSortingToSortRequest } from '@/helpers/converters';
 import { FilterBuilder } from '@/shared/FilterBuilder';
+import { PaginationRequestDTO } from '@/shared/types/dtos';
 import { EnumDefaultStatus } from '@/shared/types/enums';
-import { debounce } from '@mui/material';
-import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import { SortingState } from '@tanstack/react-table';
+import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function useUsersListQuery() {
   const [list, setList] = useState<UserPageResponseDTO>();
-  const [pagination, setPagination] = useState<GridPaginationModel>({
+  const [pagination, setPagination] = useState<PaginationRequestDTO>({
     page: 0,
-    pageSize: 10,
+    size: 10,
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const [sort, setSort] = useState<GridSortModel>();
   const [status, setStatus] = useState<keyof typeof EnumDefaultStatus>('all');
   const [query, setQuery] = useState<string>();
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const getList = async () => {
     setLoading(true);
@@ -32,9 +33,9 @@ export default function useUsersListQuery() {
     }
 
     const data = await getUsersList({
-      paginationDTO: { page: pagination.page, size: pagination.pageSize },
+      paginationDTO: pagination,
       filterRequestDTO: filterBuilder.dto,
-      sort: sort ? convertSortModelToString(sort) : 'id,desc',
+      sort: convertSortingToSortRequest(sorting),
     });
 
     setList(data);
@@ -45,18 +46,17 @@ export default function useUsersListQuery() {
 
   useEffect(() => {
     getList();
-  }, [pagination, sort, status, query]);
+  }, [pagination, status, query, sorting]);
 
   return {
     getList,
     list,
-    pagination,
     setPagination,
     loading,
-    sort,
-    setSort,
     status,
     setStatus,
     search,
+    sorting,
+    setSorting,
   };
 }

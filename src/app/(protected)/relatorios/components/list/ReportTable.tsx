@@ -1,92 +1,79 @@
-import Chip from '@/components/Chip/Chip';
-import DataGrid from '@/components/DataGrid/DataGrid';
+import Chip from '@/components/customized/Chip/Chip';
+import { DataTable } from '@/components/customized/DataTable/DataTable';
+import { Button } from '@/components/ui/button';
 import { ReportListResponseDTO } from '@/core/reports/types/dtos';
 import { Report } from '@/core/reports/types/models';
+import { PaginationRequestDTO } from '@/shared/types/dtos';
 import { EnumDefaultStatus } from '@/shared/types/enums';
-import * as Icon from '@mui/icons-material';
-import { Button } from '@mui/material';
-import { GridColDef, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
+import { Edit, Link } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Dispatch } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
 type Props = {
   list?: ReportListResponseDTO;
-  pagination: GridPaginationModel;
-  setPagination: Dispatch<React.SetStateAction<GridPaginationModel>>;
+  setPagination: Dispatch<SetStateAction<PaginationRequestDTO>>;
   loading: boolean;
-  sort?: GridSortModel;
-  setSort?: Dispatch<React.SetStateAction<GridSortModel | undefined>>;
+  sorting: SortingState;
+  setSorting: Dispatch<SetStateAction<SortingState>>;
 };
 
-export default function ReportTable({ list, pagination, setPagination, loading, sort, setSort }: Props) {
+export default function ReportTable({ list, setPagination, loading, sorting, setSorting }: Props) {
   const router = useRouter();
 
-  const columns: GridColDef<Report>[] = [
+  const columns: ColumnDef<Report>[] = [
     {
-      field: 'id',
-      headerName: 'Cód.',
-      flex: 1,
+      accessorKey: 'id',
+      header: 'Cód.',
     },
     {
-      field: 'name',
-      headerName: 'Nome',
-      flex: 1,
+      accessorKey: 'name',
+      header: 'Nome',
     },
     {
-      field: 'title',
-      headerName: 'Título',
-      flex: 1,
+      accessorKey: 'title',
+      header: 'Título',
     },
     {
-      field: 'active',
-      headerName: 'Ativo',
-      renderCell(params) {
-        return <Chip enumParams={EnumDefaultStatus[params.value]} />;
+      accessorKey: 'active',
+      header: 'Ativo',
+      cell: ({ row }) => {
+        return <Chip enumParams={EnumDefaultStatus[row.getValue('active') as keyof typeof EnumDefaultStatus]} />;
       },
-      flex: 1,
     },
     {
-      field: 'actions',
-      headerName: '',
-      renderCell: (params) => {
+      accessorKey: 'id',
+      header: '',
+      cell: ({ row }) => {
         return (
-          <div className="flex flex-row gap-10 items-center justify-center p-2">
+          <div className="flex flex-row gap-10 items-center justify-end p-2">
             <Button
-              startIcon={<Icon.Edit />}
               color="primary"
-              variant="text"
-              onClick={() => router.push(`relatorios/editar/${params.row.id}`)}
+              variant="ghost"
+              onClick={() => router.push(`relatorios/editar/${row.getValue('id')}`)}
             >
+              <Edit className="mr-2 h-4 w-4" />
               Editar
             </Button>
-            <Button
-              startIcon={<Icon.OpenInNew />}
-              color="primary"
-              variant="contained"
-              onClick={() => router.push(`relatorios/${params.row.key}`)}
-            >
+            <Button onClick={() => router.push(`relatorios/${row.original.key}`)}>
+              <Link className="mr-2 h-4 w-4" />
               Visualizar
             </Button>
           </div>
         );
       },
-      sortable: false,
-      minWidth: 350,
     },
   ];
 
   return (
-    <DataGrid
-      loading={loading}
-      rows={list?.content ?? []}
+    <DataTable
       columns={columns}
-      paginationModel={pagination}
-      onPaginationModelChange={setPagination}
-      rowCount={list?.totalElements ?? 0}
-      pageSizeOptions={(list?.totalElements ?? 0) > 10 ? [10, 25, 50] : [list?.totalElements ?? 0]}
-      sortModel={sort}
-      onSortModelChange={setSort}
-      sortingMode="server"
+      data={list?.content || []}
+      pagination={list}
+      setPagination={setPagination}
+      loading={loading}
+      sorting={sorting}
+      onSortingChange={setSorting}
     />
   );
 }

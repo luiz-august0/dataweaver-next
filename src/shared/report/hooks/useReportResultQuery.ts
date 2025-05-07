@@ -1,18 +1,19 @@
 import { getReportResult } from '@/core/reports/services/reports';
 import { ReportResultDTO } from '@/core/reports/types/dtos';
-import { convertSortModelToString } from '@/helpers/converters';
-import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import { convertSortingToSortRequest } from '@/helpers/converters';
+import { PaginationRequestDTO } from '@/shared/types/dtos';
+import { SortingState } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 
 export default function useReportResultQuery(id?: number) {
   const [filters, setFilters] = useState<{ [key: string]: any }>([]);
   const [list, setList] = useState<ReportResultDTO>();
-  const [pagination, setPagination] = useState<GridPaginationModel>({
+  const [pagination, setPagination] = useState<PaginationRequestDTO>({
     page: 0,
-    pageSize: 10,
+    size: 10,
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const [sort, setSort] = useState<GridSortModel>();
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const getList = async () => {
     if (!id) return;
@@ -21,8 +22,8 @@ export default function useReportResultQuery(id?: number) {
 
     const data = await getReportResult({
       id,
-      paginationDTO: { page: pagination.page, size: pagination.pageSize },
-      sort: sort && convertSortModelToString(sort),
+      paginationDTO: pagination,
+      sort: convertSortingToSortRequest(sorting),
       filters,
     });
 
@@ -32,16 +33,15 @@ export default function useReportResultQuery(id?: number) {
 
   useEffect(() => {
     getList();
-  }, [pagination, id, sort, filters]);
+  }, [pagination, id, sorting, filters]);
 
   return {
     getList,
     list,
-    pagination,
     setPagination,
     loading,
-    sort,
-    setSort,
+    sorting,
+    setSorting,
     filters,
     setFilters,
   };

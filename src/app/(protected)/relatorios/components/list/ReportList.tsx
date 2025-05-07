@@ -1,21 +1,18 @@
-import HeaderPage from '@/components/HeaderPage/HeaderPage';
 import { CustomizedButtonProps } from '@/shared/types/general';
-import * as Icon from '@mui/icons-material';
 import useReportListQuery from '../hooks/useReportListQuery';
 import ReportTable from './ReportTable';
 import { useRouter } from 'next/navigation';
+import HeaderPage from '@/components/customized/HeaderPage/HeaderPage';
 
 export default function ReportList() {
   const router = useRouter();
-  const { list, pagination, setPagination, loading, search, sort, setSort } = useReportListQuery();
+  const { list, setPagination, loading, search, sorting, setSorting } = useReportListQuery();
 
   const buttons: CustomizedButtonProps[] = [
     {
       label: 'Novo Relatório',
-      startIcon: <Icon.Add />,
+      startIcon: 'Plus',
       color: 'primary',
-      variant: 'contained',
-      size: 'small',
       onClick: () => router.push('/relatorios/novo'),
     },
   ];
@@ -23,14 +20,13 @@ export default function ReportList() {
   return (
     <>
       <HeaderPage titlePage="Relatórios" search={search} buttons={buttons} />
-      <div className="mt-10 px-3">
+      <div>
         <ReportTable
           list={list}
-          pagination={pagination}
           setPagination={setPagination}
           loading={loading}
-          sort={sort}
-          setSort={setSort}
+          sorting={sorting}
+          setSorting={setSorting}
         />
       </div>
     </>

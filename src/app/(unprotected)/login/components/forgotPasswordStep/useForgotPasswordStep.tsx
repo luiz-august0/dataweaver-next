@@ -2,11 +2,11 @@ import { generateRecovery } from '@/core/recovery/services/recovery';
 import { ForgotPasswordRequest } from '@/core/recovery/types/dtos';
 import { successToast } from '@/helpers/toast';
 import { yupResolver } from '@hookform/resolvers/yup';
-import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { StepProps } from '../types';
 import schemaValidation from './schemaValidation';
+import Input from '@/components/customized/Input/Input';
 
 export const useForgotPasswordStep = (): StepProps => {
   const form = useForm<ForgotPasswordRequest>({
@@ -46,18 +46,14 @@ export const useForgotPasswordStep = (): StepProps => {
     reset,
     fields: (
       <>
-        <TextField
+        <Input
           {...register('login')}
-          margin="normal"
           required
-          fullWidth
           id="login"
           label="Login"
           name="login"
           autoFocus
-          InputLabelProps={{ shrink: true }}
-          error={!!errors.login}
-          helperText={errors.login?.message}
+          errorMessage={errors.login?.message}
         />
       </>
     ),

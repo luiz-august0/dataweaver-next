@@ -1,9 +1,8 @@
-import HeaderPage from '@/components/HeaderPage/HeaderPage';
+import HeaderPage from '@/components/customized/HeaderPage/HeaderPage';
+import Skeleton from '@/components/customized/Skeleton/Skeleton';
 import { getConnection } from '@/core/connection/services/connection';
 import { Connection } from '@/core/connection/types/models';
 import { CustomizedButtonProps } from '@/shared/types/general';
-import * as Icon from '@mui/icons-material';
-import { Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import ConnectionForm from './form/ConnectionForm';
 
@@ -18,18 +17,14 @@ export default function ConnectionDetails() {
   const [connection, setConnection] = useState<Connection>();
 
   const RenderInformation = ({ label, value }: InformationProps) => {
-    const { palette } = useTheme();
-
     return (
       <div className="items-center justify-start">
         {loading ? (
-          <Skeleton variant="rounded" animation="wave" sx={{ width: 100, height: 30 }} />
+          <Skeleton className="w-80 h-6" />
         ) : (
           <>
-            <Typography fontSize={14} color={palette.grey[600]}>
-              {label}
-            </Typography>
-            {typeof value == 'string' ? <Typography fontSize={18}>{value}</Typography> : value}
+            <h1 className="text-sm text-muted-foreground">{label}</h1>
+            {typeof value == 'string' ? <h1 className="text-lg">{value}</h1> : value}
           </>
         )}
       </div>
@@ -48,11 +43,11 @@ export default function ConnectionDetails() {
   const buttons: CustomizedButtonProps[] = [
     {
       label: connection ? 'Editar Conexão' : 'Nova Conexão',
-      startIcon: connection ? <Icon.Edit /> : <Icon.Add />,
+      startIcon: connection ? 'Edit' : 'Plus',
       color: 'primary',
-      variant: connection ? 'outlined' : 'contained',
+      variant: connection ? 'outline' : 'default',
       disabled: loading,
-      size: 'small',
+      size: 'sm',
       onClick: () => setOpen(true),
     },
   ];
@@ -60,10 +55,10 @@ export default function ConnectionDetails() {
   return (
     <>
       <HeaderPage titlePage="Conexão de Base de Dados" buttons={buttons} />
-      <div className="mt-10 px-3">
+      <div>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col w-full min-h-40 bg-gray-100 rounded-md p-4 gap-4">
-            <Typography fontSize={20}>Sobre a conexão</Typography>
+          <div className="flex flex-col w-full min-h-40 bg-muted rounded-md p-4 gap-4">
+            <h1 className="text-3xl font-medium">Sobre a conexão</h1>
             <div className="flex flex-col gap-4">
               {connection || loading ? (
                 <>
@@ -73,9 +68,9 @@ export default function ConnectionDetails() {
                   <RenderInformation label="Usuário" value={connection?.username ?? ''} />
                 </>
               ) : (
-                <Typography fontSize={14}>
+                <h1 className="text-sm">
                   {"Não há cadastro de conexão com base de dados, cadastre uma clicando em 'Nova Conexão'"}
-                </Typography>
+                </h1>
               )}
             </div>
           </div>

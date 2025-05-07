@@ -1,6 +1,7 @@
-import FilterDrawer from '@/components/FilterDrawer/FilterDrawer';
+import FilterDrawer from '@/components/customized/FilterDrawer/FilterDrawer';
 import { EnumDefaultStatus } from '@/shared/types/enums';
-import { InputLabel, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Label } from '@/components/ui/label';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Dispatch } from 'react';
 
 type Props = {
@@ -18,19 +19,25 @@ export default function Filters({ openFilter, setOpenFilter, status, setStatus }
 
   return (
     <FilterDrawer openFilter={openFilter} setOpenFilter={setOpenFilter} disableButtons>
-      <div>
-        <InputLabel>Situação</InputLabel>
-        <ToggleButtonGroup
-          fullWidth
-          value={status}
-          exclusive
-          onChange={(_, value) => handleStatus(value??status)}
-          color="primary"
+      <div className="space-y-2">
+        <Label htmlFor="status-toggle">Situação</Label>
+        <ToggleGroup
+          type="single"
+          id="status-toggle"
+          value={status as string}
+          onValueChange={(value) => handleStatus(value || status)}
+          className="w-full"
         >
-          <ToggleButton value={'true'}>Ativo</ToggleButton>
-          <ToggleButton value={'false'}>Inativo</ToggleButton>
-          <ToggleButton value={'all'}>Todos</ToggleButton>
-        </ToggleButtonGroup>
+          <ToggleGroupItem value="true" className="w-full">
+            Ativo
+          </ToggleGroupItem>
+          <ToggleGroupItem value="false" className="w-full">
+            Inativo
+          </ToggleGroupItem>
+          <ToggleGroupItem value="all" className="w-full">
+            Todos
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
     </FilterDrawer>
   );

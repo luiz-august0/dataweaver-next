@@ -1,16 +1,19 @@
-import StandardForm from '@/components/FormTypes/StandardForm';
-import { FormButton } from '@/components/FormTypes/types/models';
-import PasswordInput from '@/components/PasswordInput/PasswordInput';
+import StandardForm from '@/components/customized/FormTypes/StandardForm';
+import { FormButton } from '@/components/customized/FormTypes/types/models';
+import Input from '@/components/customized/Input/Input';
+import PasswordInput from '@/components/customized/PasswordInput/PasswordInput';
+import { Button } from '@/components/ui/button';
 import { mutateUser } from '@/core/users/services/users';
 import { User } from '@/core/users/types/models';
 import { successToast } from '@/helpers/toast';
 import { MultipartBean } from '@/shared/types/models';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, CircularProgress, FormControlLabel, Switch, TextField } from '@mui/material';
+import { Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Dispatch, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { schemaValidation } from './schemaValidation';
+import Switch from '@/components/customized/Switch/Switch';
 
 type Props = {
   user?: User;
@@ -38,11 +41,11 @@ export default function UserForm({ user, userAuthenticated, open, setOpen, onSub
   });
 
   const {
+    watch,
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
     setValue,
   } = form;
 
@@ -97,7 +100,7 @@ export default function UserForm({ user, userAuthenticated, open, setOpen, onSub
       title: 'Cancelar',
       color: 'primary',
       onClick: handleClose,
-      variant: 'outlined',
+      variant: 'outline',
     },
     {
       id: 'submit',
@@ -106,7 +109,7 @@ export default function UserForm({ user, userAuthenticated, open, setOpen, onSub
       color: 'primary',
       onClick: handleSubmit(onSubmit),
       loading: loading,
-      variant: 'contained',
+      variant: 'default',
     },
   ];
 
@@ -119,41 +122,32 @@ export default function UserForm({ user, userAuthenticated, open, setOpen, onSub
     <FormProvider {...form}>
       <StandardForm
         formButtons={buttons}
-        formTitle={userAuthenticated ? 'Editar meu usuário' : user ? `Usuário #${user.id}` : 'Novo'}
+        formTitle={userAuthenticated ? 'Editar meu usuário' : user ? `Editar usuário` : 'Novo'}
         handleClose={handleClose}
         open={open}
       >
         {loadingUser ? (
           <div className="flex justify-center">
-            <CircularProgress />
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="flex flex-col mt-4 gap-4">
+          <div className="flex flex-col gap-4">
             {(userAuthenticated || user?.id) && (
               <div
-                className="flex items-center"
+                className="flex items-end"
                 style={{
                   justifyContent: userAuthenticated ? 'flex-end' : 'space-between',
                 }}
               >
                 {!userAuthenticated && user?.login !== 'admin' && (
-                  <FormControlLabel
-                    sx={{ margin: '0', marginBottom: '16px' }}
-                    value="top"
-                    control={
-                      <Switch
-                        checked={watch('active')}
-                        onChange={() => setValue('active', !watch('active'))}
-                        name="active"
-                        color="primary"
-                        id="user-active-switch"
-                      />
-                    }
+                  <Switch
                     label="Ativo"
-                    labelPlacement="top"
+                    id="user-active-switch"
+                    checked={watch('active')}
+                    onCheckedChange={(checked) => setValue('active', checked)}
                   />
                 )}
-                <Button onClick={() => setUpdatePassword(true)} variant={'outlined'} color={'primary'}>
+                <Button onClick={() => setUpdatePassword(true)} variant={'default'}>
                   Alterar senha
                 </Button>
               </div>
@@ -177,30 +171,24 @@ export default function UserForm({ user, userAuthenticated, open, setOpen, onSub
                 label="Foto de perfil"
                 labelPlacement="top"
               /> */}
-              <TextField
+              <Input
                 {...register('login')}
                 required
-                fullWidth
                 id="user-login-text"
                 label="Login"
                 name="login"
                 disabled={user?.login == 'admin'}
-                error={!!errors.login}
-                helperText={errors.login?.message}
+                errorMessage={errors.login?.message}
               />
               {(updatePassword || !user) && (
                 <PasswordInput
-                  value={watch('password')}
-                  onChange={(e) => setValue('password', e.target.value)}
-                  margin="normal"
+                  {...register('password')}
                   required
                   id="password"
-                  fullWidth
                   name="password"
                   autoFocus
                   label="Senha"
-                  error={!!errors.password}
-                  helperText={errors.password?.message}
+                  errorMessage={errors.password?.message}
                 />
               )}
             </div>
