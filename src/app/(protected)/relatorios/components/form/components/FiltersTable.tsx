@@ -124,7 +124,7 @@ export const FiltersTable = ({ setFilterIndex }: Props) => {
             }}
             placeholder="Tipo"
             onKeyDown={(e) => e.stopPropagation()}
-            error={!!errors.filters?.[index]?.type?.message}
+            error={!!errors.filters?.[index]?.type}
           />
         );
       },

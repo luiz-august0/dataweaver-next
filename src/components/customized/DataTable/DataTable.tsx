@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   OnChangeFn,
   SortingState,
-  useReactTable
+  useReactTable,
 } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -28,18 +28,28 @@ interface DataTableProps<TData, TValue> {
   onSortingChange?: OnChangeFn<SortingState>;
 }
 
-export function SortableHeader({ column, header }: { column: Column<any, unknown>; header: string }) {
+export function SortableHeader({
+  column,
+  header,
+  align,
+}: {
+  column: Column<any, unknown>;
+  header: string;
+  align?: string;
+}) {
   return (
-    <Button className="px-0" variant="ghost" onClick={() => column.toggleSorting()}>
-      {header}
-      {column.getIsSorted() === 'asc' ? (
-        <ArrowUp />
-      ) : !!column.getIsSorted() ? (
-        <ArrowDown />
-      ) : (
-        <ArrowUpDown className="text-gray-300" />
-      )}
-    </Button>
+    <div className={`text-${align ?? 'left'}`}>
+      <Button className="px-0" variant="ghost" onClick={() => column.toggleSorting()}>
+        {header}
+        {column.getIsSorted() === 'asc' ? (
+          <ArrowUp />
+        ) : !!column.getIsSorted() ? (
+          <ArrowDown />
+        ) : (
+          <ArrowUpDown className="text-gray-300" />
+        )}
+      </Button>
+    </div>
   );
 }
 

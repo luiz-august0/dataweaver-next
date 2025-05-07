@@ -58,7 +58,7 @@ export const EditorForm = ({ open, handleClose, language, field, formTitle }: Pr
           height="350px"
           defaultLanguage={language}
           value={input}
-          error={field && errors?.[field]?.message}
+          errorMessage={field && errors?.[field]?.message}
           onChange={(value: any) => {
             setInput(value);
             clearErrors(field);

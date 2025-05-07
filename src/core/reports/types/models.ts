@@ -5,7 +5,7 @@ export interface Report {
   key: string;
   sql: string;
   sqlTotalizers?: string;
-  active: boolean;
+  active?: boolean;
   columns?: ReportColumn[];
   filters?: ReportFilter[];
   hasTotalizers?: boolean;

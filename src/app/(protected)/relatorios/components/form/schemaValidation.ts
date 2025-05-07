@@ -1,12 +1,12 @@
-import { ReportColumnAlignEnum, ReportColumnFormatEnum, ReportFilterEnum } from '@/core/reports/types/models';
+import { Report, ReportColumnAlignEnum, ReportColumnFormatEnum, ReportFilterEnum } from '@/core/reports/types/models';
 import yup from '@/lib/yup/yup';
+import { ObjectSchema } from 'yup';
 
-export default yup.object().shape({
+const reportSchema: ObjectSchema<Report> = yup.object({
   name: yup.string().required().label('Nome'),
   title: yup.string().required().label('Título'),
   key: yup.string().required().label('Chave de URL'),
   sql: yup.string().required().label('SQL'),
-  active: yup.boolean().required().label('Ativo'),
   columns: yup.array(
     yup.object({
       field: yup.string().required().label('Campo'),
@@ -29,18 +29,24 @@ export default yup.object().shape({
         .required()
         .label('Formatação é obrigatório'),
     }),
-  ),
+  ).optional().label('Colunas'),
   filters: yup.array(
     yup.object({
       label: yup.string().required().label('Label'),
       parameter: yup.string().required().label('Parâmetro'),
+      sql: yup.string().required().label('SQL'),
       type: yup
         .mixed<keyof typeof ReportFilterEnum>()
         .oneOf(Object.keys(ReportFilterEnum) as (keyof typeof ReportFilterEnum)[])
         .required()
         .label('Tipo é obrigatório'),
-      sql: yup.string().required().label('SQL'),
       sort: yup.number().required().label('Ordem'),
     }),
-  ),
-});
+  ).optional().label('Filtros'),
+  sqlTotalizers: yup.string().optional().label('SQL Totalizadores'),
+  active: yup.boolean().optional().label('Ativo'),
+  hasTotalizers: yup.boolean().optional().label('Possui Totalizadores'),
+  id: yup.number().optional().label('ID'),
+}) as ObjectSchema<Report>;
+
+export default reportSchema;

@@ -1,21 +1,21 @@
+import HeaderPage from '@/components/customized/HeaderPage/HeaderPage';
+import Input from '@/components/customized/Input/Input';
+import { MonacoEditor } from '@/components/customized/MonacoEditor/MonacoEditor';
+import Switch from '@/components/customized/Switch/Switch';
+import { Button } from '@/components/ui/button';
 import { getReportById, mutateReport } from '@/core/reports/services/reports';
 import { Report } from '@/core/reports/types/models';
 import { successToast } from '@/helpers/toast';
 import { yupResolver } from '@hookform/resolvers/yup';
+import debounce from 'lodash.debounce';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ColumnsTable } from './components/ColumnsTable';
 import { EditorForm } from './components/EditorForm';
-import schemaValidation from './schemaValidation';
-import { Loader2, Save, SaveAll } from 'lucide-react';
-import Switch from '@/components/customized/Switch/Switch';
-import Input from '@/components/customized/Input/Input';
-import { MonacoEditor } from '@/components/customized/MonacoEditor/MonacoEditor';
-import debounce from 'lodash.debounce';
-import { Button } from '@/components/ui/button';
-import HeaderPage from '@/components/customized/HeaderPage/HeaderPage';
 import { FiltersTable } from './components/FiltersTable';
+import schemaValidation from './schemaValidation';
 
 type Props = {
   id?: number;
@@ -141,7 +141,11 @@ export const ReportForm = ({ id }: Props) => {
         </div>
         <ColumnsTable setColumnIndex={setColumnIndex} />
         <FiltersTable setFilterIndex={setFilterIndex} />
-        <Button className="self-end mt-1.5 w-32" disabled={loadingSubmit} onClick={handleSubmit(onSubmit)}>
+        <Button
+          className="self-end mt-1.5 w-32"
+          disabled={loadingSubmit}
+          onClick={handleSubmit((data) => onSubmit(data as unknown as Report))}
+        >
           Salvar
         </Button>
         <EditorForm

@@ -38,10 +38,14 @@ export const Report = () => {
     report?.columns?.map((reportColumn) => {
       return {
         accessorKey: reportColumn.field,
-        header: ({ column }) => <SortableHeader column={column} header={reportColumn.headerName} />,
-        // align: column.align,
-        // headerAlign: column.headerAlign as GridAlignment,
-        cel: ({ row }) => {
+        header: ({ column }) => (
+          <SortableHeader
+            column={column}
+            header={reportColumn.headerName}
+            align={reportColumn.headerAlign.toLowerCase()}
+          />
+        ),
+        cell: ({ row }) => {
           const regex = /item\.[a-zA-Z0-9_]+/g;
           let html = reportColumn.html;
           let matches;
@@ -50,7 +54,12 @@ export const Report = () => {
             html = html.replace(matches[0], row.getValue(matches[0].split('.')[1]));
           }
 
-          return <div dangerouslySetInnerHTML={{ __html: html }}></div>;
+          return (
+            <div
+              className={`text-${reportColumn.align.toLowerCase()}`}
+              dangerouslySetInnerHTML={{ __html: html }}
+            ></div>
+          );
         },
       };
     }) ?? [];
